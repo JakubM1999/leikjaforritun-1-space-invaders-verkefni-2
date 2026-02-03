@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Godot Námskeið - Space Invaders</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .menu-btn-large {
+            display: block;
+            width: 100%;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background: transparent;
+            border: 2px solid var(--fg-color);
+            color: var(--fg-color);
+            font-family: inherit;
+            font-size: 1.5rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .menu-btn-large:hover {
+            background-color: var(--fg-color);
+            color: #000;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--fg-color);
+        }
+        /* Space Invaders Demo Styles */
+        .invaders-demo {
+            position: relative;
+            width: 400px;
+            height: 200px;
+            border: none;
+            margin: 3rem auto 0;
+            overflow: hidden;
+            transform: scale(0.8);
+        }
+        .invader {
+            position: absolute;
+            width: 20px;
+            height: 15px;
+            background-color: var(--accent-color); /* Magenta */
+            box-shadow: 0 0 5px var(--accent-color);
+            clip-path: polygon(0% 20%, 20% 20%, 20% 0%, 40% 0%, 40% 20%, 60% 20%, 60% 0%, 80% 0%, 80% 20%, 100% 20%, 100% 60%, 80% 60%, 80% 80%, 60% 80%, 60% 100%, 40% 100%, 40% 80%, 20% 80%, 20% 60%, 0% 60%);
+        }
+        .ship {
+            position: absolute;
+            bottom: 10px;
+            width: 30px;
+            height: 15px;
+            background-color: var(--fg-color); /* Cyan */
+            box-shadow: 0 0 5px var(--fg-color);
+            clip-path: polygon(40% 0%, 60% 0%, 60% 40%, 100% 40%, 100% 100%, 0% 100%, 0% 40%, 40% 40%);
+        }
+        .bullet {
+            position: absolute;
+            width: 4px;
+            height: 10px;
+            background-color: var(--highlight-color); /* Yellow */
+            box-shadow: 0 0 5px var(--highlight-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="crt-overlay"></div>
+    
+    <div class="menu-container">
+        <h1>LEIKJAFORRITUN 1</h1>
+        <h2>FORR2GL05DU</h2>
+        <br>
+        
+        <a href="intro.html" class="menu-btn-large">
+            1. SPACE INVADERS - INNGANGUR
+        </a>
+        
+        <a href="guide.html" class="menu-btn-large">
+            2. VERKEFNI 2 : SPACE INVADERS
+        </a>
+
+        <div class="invaders-demo" id="invaders-demo">
+            <div class="ship" id="demo-ship" style="left: 185px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const demo = document.getElementById('invaders-demo');
+        const ship = document.getElementById('demo-ship');
+        
+        let invaders = [];
+        let bullets = [];
+        let shipX = 185;
+        let direction = 1;
+        let moveTimer = 0;
+        let shootTimer = 0;
+
+        // Initialize Invaders
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 8; col++) {
+                const invader = document.createElement('div');
+                invader.className = 'invader';
+                invader.style.left = (col * 40 + 50) + 'px';
+                invader.style.top = (row * 30 + 20) + 'px';
+                demo.appendChild(invader);
+                invaders.push({ el: invader, x: col * 40 + 50, y: row * 30 + 20 });
+            }
+        }
+
+        function update() {
+            moveTimer++;
+            shootTimer++;
+
+            // Move Invaders
+            if (moveTimer > 30) {
+                moveTimer = 0;
+                let hitWall = false;
+                invaders.forEach(inv => {
+                    inv.x += 10 * direction;
+                    if (inv.x > 360 || inv.x < 20) hitWall = true;
+                });
+
+                if (hitWall) {
+                    direction *= -1;
+                    invaders.forEach(inv => {
+                        inv.y += 10;
+                        if (inv.y > 150) inv.y = 20; // Loop back up
+                    });
+                }
+
+                invaders.forEach(inv => {
+                    inv.el.style.left = inv.x + 'px';
+                    inv.el.style.top = inv.y + 'px';
+                });
+            }
+
+            // Ship AI
+            const targetX = invaders.length > 0 ? invaders[0].x : 185;
+            if (shipX < targetX) shipX += 2;
+            else if (shipX > targetX) shipX -= 2;
+            ship.style.left = shipX + 'px';
+
+            // Shooting
+            if (shootTimer > 50) {
+                shootTimer = 0;
+                const bullet = document.createElement('div');
+                bullet.className = 'bullet';
+                bullet.style.left = (shipX + 13) + 'px';
+                bullet.style.bottom = '25px';
+                demo.appendChild(bullet);
+                bullets.push({ el: bullet, x: shipX + 13, y: 175 });
+            }
+
+            // Update Bullets
+            bullets.forEach((b, index) => {
+                b.y -= 5;
+                b.el.style.top = b.y + 'px';
+
+                // Collision with invaders
+                invaders.forEach((inv, iIndex) => {
+                    if (b.x > inv.x && b.x < inv.x + 20 && b.y > inv.y && b.y < inv.y + 15) {
+                        inv.el.style.display = 'none';
+                        // Just hide it for demo
+                        inv.y = -100; 
+                        b.y = -100;
+                    }
+                });
+
+                if (b.y < 0) {
+                    b.el.remove();
+                    bullets.splice(index, 1);
+                }
+            });
+
+            // Reset invaders if all "gone"
+            if (invaders.every(inv => inv.y < 0)) {
+                invaders.forEach((inv, i) => {
+                    inv.y = (Math.floor(i / 8) * 30 + 20);
+                    inv.el.style.display = 'block';
+                });
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        requestAnimationFrame(update);
+    </script>
+</body>
+</html>

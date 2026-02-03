@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Invaders - Skref fyrir Skref</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="crt-overlay"></div>
+
+    <div id="slides-container">
+        <!-- Slide 1: Start -->
+        <section class="slide active" id="slide-1">
+            <div class="content centered">
+                <h1>VERKEFNI 2: SPACE INVADERS</h1>
+                <h2>LEIÐBEININGAR</h2>
+                <p>Hér munum við byggja herinn og verja jörðina.</p>
+                <br>
+                <div class="blink">ÝTTU Á SPACE TIL AÐ BYRJA</div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Prerequisites -->
+        <section class="slide" id="slide-2">
+            <div class="content">
+                <h2>ÁÐUR EN VIÐ BYRJUM</h2>
+                <p>Munið þið eftir Pong? Við munum nota sömu grunnþekkingu hér:</p>
+                <br>
+                <ul>
+                    <li><strong>Scenes:</strong> Við búum til sér scenes fyrir Player, Invader og Bullet.</li>
+                    <li><strong>Physics:</strong> Við notum <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> til að skynja árekstra.</li>
+                    <li><strong>Scripting:</strong> Við notum <code>_process</code> til að hreyfa hluti.</li>
+                </ul>
+                <p><em>Við munum bæta við: Signals (Samskipti) og Groups (Hópstjórnun).</em></p>
+            </div>
+        </section>
+
+        <!-- Slide 3: Project Setup -->
+        <section class="slide" id="slide-3">
+            <div class="content">
+                <h2>SKREF 1: UPPSETNING (SETUP)</h2>
+                <p>Búðu til nýtt Godot verkefni sem heitir "Space Invaders".</p>
+                <br>
+                <ol>
+                    <li>Farðu í <strong><img src="images/icons/Tools.svg" class="icon-inline">Project -> Project Settings</strong>.</li>
+                    <li>Stilltu <strong>Window Width</strong> á <code>600</code> og <strong>Height</strong> á <code>800</code>.</li>
+                    <li>Stilltu <strong>Stretch Mode</strong> á <code>canvas_items</code>.</li>
+                    <li>Búðu til "Main" scene (<strong><img src="images/icons/Node2D.svg" class="icon-inline">Node2D</strong>) og vistaðu sem <code>main.tscn</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Slide 4: Player Scene -->
+        <section class="slide" id="slide-4">
+            <div class="content">
+                <h2>SKREF 2: LEIKMAÐURINN (PLAYER SCENE)</h2>
+                <p>Við byrjum á skipinu okkar.</p>
+                <br>
+                <ol>
+                    <li>Búðu til nýtt Scene. Notaðu <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> sem rót.</li>
+                    <li>Nefndu það <code>Player</code>.</li>
+                    <li>Bættu við <strong><img src="images/icons/Sprite2D.svg" class="icon-inline">Sprite2D</strong> (eða <strong><img src="images/icons/ColorRect.svg" class="icon-inline">ColorRect</strong> 40x20 px).</li>
+                    <li>Bættu við <strong><img src="images/icons/CollisionShape2D.svg" class="icon-inline">CollisionShape2D</strong> (RectangleShape) sem passar.</li>
+                    <li>Vistaðu sem <code>player.tscn</code>.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Slide 5: Player Movement -->
+        <section class="slide" id="slide-5">
+            <div class="content">
+                <h2>SKREF 3: HREYFING LEIKMANNS</h2>
+                <p>Setjum skriftu á Player. Notum <code>clamp</code> til að halda honum inni.</p>
+                <pre><code>extends Area2D
+
+@export var speed = 400
+
+func _process(delta):
+    var input = Input.get_axis("ui_left", "ui_right")
+    position.x += input * speed * delta
+    
+    # Halda innan skjás (20px padding)
+    position.x = clamp(position.x, 20, 580)</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 6: Bullet Scene -->
+        <section class="slide" id="slide-6">
+            <div class="content">
+                <h2>SKREF 4: SKOTIÐ (BULLET SCENE)</h2>
+                <p>Búum til leysiskot.</p>
+                <br>
+                <ol>
+                    <li>Nýtt Scene -> <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> -> <code>Bullet</code>.</li>
+                    <li><strong><img src="images/icons/ColorRect.svg" class="icon-inline">ColorRect</strong> (4x15 px, gult).</li>
+                    <li><strong><img src="images/icons/CollisionShape2D.svg" class="icon-inline">CollisionShape2D</strong>.</li>
+                    <li><strong><img src="images/icons/VisibleOnScreenNotifier2D.svg" class="icon-inline">VisibleOnScreenNotifier2D</strong> (til að eyða því þegar það fer út).</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Slide 7: Bullet Logic -->
+        <section class="slide" id="slide-7">
+            <div class="content">
+                <h2>SKREF 5: KÓÐI SKOTSINS</h2>
+                <p>Skotið fer upp og eyðist ef það fer af skjánum.</p>
+                <pre><code>extends Area2D
+@export var speed = 600
+
+func _process(delta):
+    position.y -= speed * delta
+
+func _on_visible_on_screen_notifier_2d_screen_exited():
+    queue_free()</code></pre>
+                <p>Mundu að tengja <code>screen_exited</code> merkið!</p>
+            </div>
+        </section>
+
+        <!-- Slide 8: Shooting Mechanic -->
+        <section class="slide" id="slide-8">
+            <div class="content">
+                <h2>SKREF 6: AÐ SKJÓTA</h2>
+                <p>Aftur í <strong>Player</strong> skriftuna. Tengjum Bullet senuna.</p>
+                <pre><code>@export var bullet_scene: PackedScene
+
+func _process(delta):
+    # ... hreyfing ...
+    if Input.is_action_just_pressed("ui_accept"):
+        shoot()
+
+func shoot():
+    var b = bullet_scene.instantiate()
+    get_parent().add_child(b)
+    b.position = position</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 9: Cooldown (Timer) -->
+        <section class="slide" id="slide-9">
+            <div class="content">
+                <h2>SKREF 7: SKOTHRAÐI (COOLDOWN)</h2>
+                <p>Við viljum ekki "laser beam". Bætum við biðtíma.</p>
+                <br>
+                <ol>
+                    <li>Bættu <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> node við Player.</li>
+                    <li>Stilltu <strong>One Shot</strong> á ON og <strong>Wait Time</strong> á 0.5.</li>
+                </ol>
+                <pre><code>func _process(delta):
+    # Bætum við skilyrði: Timer verður að vera stopp
+    if Input.is_action_just_pressed("ui_accept") and $Timer.is_stopped():
+        shoot()
+        $Timer.start() # Ræsa klukkuna</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 10: Invader Scene -->
+        <section class="slide" id="slide-10">
+            <div class="content">
+                <h2>SKREF 8: GEIMVERAN (INVADER)</h2>
+                <p>Nú búum við til óvininn.</p>
+                <br>
+                <ol>
+                    <li>Nýtt Scene -> <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> -> <code>Invader</code>.</li>
+                    <li>Setja upp Visuals og CollisionShape.</li>
+                    <li><strong>Groups:</strong> Farðu í "Node" flipann -> Groups. Bættu við hópnum <code>aliens</code>.</li>
+                </ol>
+                <p>Þessi hópur er lykillinn að því að stjórna öllum hernum í einu.</p>
+            </div>
+        </section>
+
+        <!-- Slide 11: Invader Movement Script -->
+        <section class="slide" id="slide-11">
+            <div class="content">
+                <h2>SKREF 9: HREYFING GEIMVERU</h2>
+                <p>Geimveran hreyfist <strong>ekki</strong> sjálf. Hún bíður eftir skipun.</p>
+                <pre><code>extends Area2D
+
+func move(dx, dy):
+    position.x += dx
+    position.y += dy</code></pre>
+                <p>Við munum kalla á þetta fall utan frá með <code>call_group</code>.</p>
+            </div>
+        </section>
+
+        <!-- Slide 12: Spawning the Grid -->
+        <section class="slide" id="slide-12">
+            <div class="content">
+                <h2>SKREF 10: RÖÐUN Í GRIND</h2>
+                <p>Í <strong>Main</strong> skriftunni búum við til herinn.</p>
+                <pre><code>extends Node2D
+@export var invader_scene: PackedScene
+
+func _ready():
+    # 5 raðir, 8 dálkar
+    for row in range(5):
+        for col in range(8):
+            var inv = invader_scene.instantiate()
+            # Reikna staðsetningu
+            inv.position = Vector2(60 + col * 50, 50 + row * 40)
+            add_child(inv)</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 13: Army Movement Timer -->
+        <section class="slide" id="slide-13">
+            <div class="content">
+                <h2>SKREF 11: TAKTURINN (TIMER)</h2>
+                <p>Herinn hreyfist í takt. Notum Timer í Main scene.</p>
+                <br>
+                <ol>
+                    <li>Bættu <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> við Main.</li>
+                    <li>Wait Time: 1.0 (eða hraðar). Autostart: ON.</li>
+                    <li>Tengdu <code>timeout</code> merkið við Main skriftuna.</li>
+                </ol>
+                <pre><code>var direction = 10
+
+func _on_timer_timeout():
+    get_tree().call_group("aliens", "move", direction, 0)</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 14: Wall Detection (Signals) -->
+        <section class="slide" id="slide-14">
+            <div class="content">
+                <h2>SKREF 12: VEGGJAMERKI (SIGNALS)</h2>
+                <p>Hvernig vitum við ef herinn hittir vegg? Geimveran lætur vita!</p>
+                <br>
+                <p>Í <strong>Invader</strong> skriftunni:</p>
+                <pre><code># Skilgreina merki
+signal hit_wall
+
+func move(dx, dy):
+    position.x += dx
+    position.y += dy
+    # Athuga hvort við séum komin út í kant
+    if position.x > 550 or position.x < 50:
+        hit_wall.emit()</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 15: Handling Wall Hit -->
+        <section class="slide" id="slide-15">
+            <div class="content">
+                <h2>SKREF 13: TENGJA VEGGJAMERKIÐ</h2>
+                <p>Þegar Main býr til invader, þarf það að hlusta eftir merkinu.</p>
+                <pre><code># Í Main _ready lykkjunni:
+    inv.hit_wall.connect(_on_alien_hit_wall)
+
+# Nýtt fall í Main:
+func _on_alien_hit_wall():
+    direction *= -1 # Snúa við
+    get_tree().call_group("aliens", "move", 0, 20) # Fara niður</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 16: Alien Attacks (Randomness) -->
+        <section class="slide" id="slide-16">
+            <div class="content">
+                <h2>SKREF 14: RANDOM ÁRÁSIR</h2>
+                <p>Nú kemur <strong>Slembilukka</strong> (Randomness) inn. Geimverurnar skjóta til baka.</p>
+                <br>
+                <p>Í <strong>Invader</strong> skriftu, í <code>move</code> fallinu (sem keyrir reglulega):</p>
+                <pre><code>if randf() < 0.05: # 5% líkur í hvert skref
+    shoot_at_player()</code></pre>
+                <p>Þetta er betra en <code>_process</code> því það gerist bara í takt við leikinn.</p>
+            </div>
+        </section>
+
+        <!-- Slide 17: Enemy Bullet -->
+        <section class="slide" id="slide-17">
+            <div class="content">
+                <h2>SKREF 15: ÓVINASKOT</h2>
+                <p>Við þurfum annað skot fyrir óvininn svo hann hitti ekki aðrar geimverur.</p>
+                <br>
+                <ol>
+                    <li>Duplicate-aðu <code>Bullet</code> scene og nefndu <code>EnemyBullet</code>.</li>
+                    <li>Breyttu litnum í rauðan.</li>
+                    <li>Breyttu skriftunni svo það fari <strong>niður</strong> (<code>position.y += speed</code>).</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Slide 18: Player Death (Groups) -->
+        <section class="slide" id="slide-18">
+            <div class="content">
+                <h2>SKREF 16: LEIKMAÐUR DEYR</h2>
+                <p>Setjum Player í hópinn <code>player</code>.</p>
+                <br>
+                <p>Í <strong>EnemyBullet</strong> skriftunni:</p>
+                <pre><code>func _on_area_entered(area):
+    if area.is_in_group("player"):
+        area.queue_free() # Drepa leikmann
+        queue_free()      # Eyða skoti
+        print("GAME OVER")</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 19: Scoring System -->
+        <section class="slide" id="slide-19">
+            <div class="content">
+                <h2>SKREF 17: STIGAGJÖF (SCORING)</h2>
+                <p>Notum Signals til að telja stig.</p>
+                <br>
+                <p>1. Í <strong>Invader</strong>: <code>signal destroyed</code>. Emittaðu þetta áður en <code>queue_free()</code> gerist.<br>
+                2. Í <strong>Main</strong>: Tengdu merkið við stigateljara.</p>
+                <pre><code># Í Main
+var score = 0
+func _on_invader_destroyed():
+    score += 100
+    print("Score: ", score)</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 20: Win Condition -->
+        <section class="slide" id="slide-20">
+            <div class="content">
+                <h2>SKREF 18: SIGUR (WIN)</h2>
+                <p>Hvernig vitum við hvort við unnum? Við teljum hópinn!</p>
+                <br>
+                <pre><code>func _process(delta):
+    # Ef enginn er eftir í hópnum...
+    if get_tree().get_nodes_in_group("aliens").size() == 0:
+        print("YOU WIN!")
+        set_process(false) # Stoppa leikinn</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 21: Polish -->
+        <section class="slide" id="slide-21">
+            <div class="content">
+                <h2>SKREF 19: PÚSSNING</h2>
+                <p>Leikurinn virkar, en má vera betri.</p>
+                <ul>
+                    <li>Lagaðu hraðann á Timer (hraðar þegar færri eru eftir?).</li>
+                    <li>Breyttu litunum.</li>
+                    <li>Settu bakgrunn.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 22: Summary -->
+        <section class="slide" id="slide-22">
+            <div class="content centered">
+                <h2>LOKASKREF</h2>
+                <p>Þú hefur nú smíðað Space Invaders með Signals og Groups!</p>
+                <br>
+                <p>Mundu að skila verkefninu sem ZIP skrá á Innu.</p>
+                <br>
+                <a href="index.html" class="menu-btn">AFTUR Í VALMYND</a>
+            </div>
+        </section>
+
+    </div>
+    <div class="controls">
+        <a href="index.html" class="menu-btn">VALMYND</a>
+        <button id="prev-btn">FYRRI</button>
+        <div class="slide-indicator">01</div>
+        <button id="next-btn">NÆSTI</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+:root {
+    --bg-color: #000000;
+    --fg-color: #00ffff; /* Cyan (Player) */
+    --accent-color: #ff00ff; /* Magenta (Enemy/Danger) */
+    --highlight-color: #ffff00; /* Yellow (Bonus/Stars) */
+    --text-color: #ffffff; /* White for readability */
+    --placeholder-bg: rgba(0, 20, 40, 0.5);
+    --placeholder-border: #00aaaa;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #050505; 
+    color: var(--text-color);
+    font-family: 'Courier New', Courier, monospace;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+    
+    /* 80s Starfield Background */
+    background-image: 
+        radial-gradient(white, rgba(255,255,255,.6) 2px, transparent 3px),
+        radial-gradient(var(--highlight-color), rgba(255,255,0,.4) 1px, transparent 2px),
+        radial-gradient(#ffccff, rgba(255,200,255,.3) 2px, transparent 3px);
+    background-size: 550px 550px, 350px 350px, 250px 250px;
+    background-position: 0 0, 40px 60px, 130px 270px;
+    animation: stars-move 100s linear infinite;
+}
+
+@keyframes stars-move {
+    from { background-position: 0 0, 40px 60px, 130px 270px; }
+    to { background-position: 550px 550px, 390px 410px, 380px 520px; }
+}
+
+/* GLOBAL CRT OVERLAY: Vignette + Scanlines + RGB Split */
+body::after {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    
+    /* 1. Scanlines */
+    background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 3px, 3px 100%;
+    
+    /* 2. Vignette */
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+    
+    pointer-events: none;
+    z-index: 9999; /* On top of everything */
+}
+
+/* Glass Reflection */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(0,255,255,0.03) 50%, rgba(255,0,255,0.03) 51%, rgba(255,255,255,0) 100%);
+    z-index: 101;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Slide Container - INVISIBLE, just layout */
+#slides-container {
+    width: 95%;
+    max-width: 1400px;
+    height: 85vh;
+    position: relative;
+    z-index: 5;
+    
+    /* Removed Box Styling */
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    
+    padding: 3rem;
+    /* Keeping subtle tilt for 3D feel */
+    transform: rotateX(1deg); 
+}
+
+/* Removed local scanlines since global handles it */
+#slides-container::after { display: none; }
+.controls::after { display: none; }
+
+.controls {
+    margin-top: 1rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    z-index: 10;
+    position: relative;
+}
+
+.slide {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+/* Custom Scrollbar - Neon Style */
+.slide::-webkit-scrollbar {
+    width: 10px;
+}
+
+.slide::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+    border-left: 1px solid var(--fg-color);
+}
+
+.slide::-webkit-scrollbar-thumb {
+    background: var(--fg-color);
+    box-shadow: 0 0 10px var(--fg-color);
+    border-radius: 0;
+}
+
+.slide.active {
+    display: flex;
+    animation: none; 
+}
+
+/* Typography */
+h1 {
+    font-size: 4rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--fg-color);
+    /* Stronger text shadow for legibility without background */
+    text-shadow: 
+        3px 3px 0px var(--accent-color),
+        0 0 20px var(--fg-color),
+        0 0 10px #000;
+    letter-spacing: 5px;
+    font-weight: 900;
+}
+
+h2 {
+    font-size: 2rem;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    border-bottom: 3px solid var(--accent-color);
+    box-shadow: 0 3px 10px -5px var(--accent-color);
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    color: var(--highlight-color);
+    text-shadow: 
+        2px 2px 0 #000,
+        0 0 10px var(--highlight-color);
+}
+
+p, li {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    /* Essential for reading on stars */
+    text-shadow: 
+        2px 2px 0 #000, 
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    font-weight: bold;
+}
+
+ul {
+    list-style-type: square;
+    padding-left: 2rem;
+}
+
+a {
+    color: var(--fg-color);
+    text-decoration: underline;
+    text-shadow: 2px 2px 0 #000;
+}
+
+a:hover {
+    color: var(--highlight-color);
+    text-decoration: none;
+    text-shadow: 0 0 15px var(--highlight-color);
+}
+
+/* Layout Helpers */
+.centered {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+/* Placeholders */
+.placeholder-box {
+    border: 2px dashed var(--fg-color);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: var(--fg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+    min-height: 200px;
+    width: 100%;
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2);
+    backdrop-filter: blur(2px);
+}
+
+/* Video specific */
+.video-container {
+    position: relative;
+    z-index: 120;
+    border: 3px solid var(--fg-color);
+    box-shadow: 0 0 20px var(--fg-color);
+    line-height: 0;
+    background-color: #000;
+    max-width: 1100px;
+    margin: 2rem auto;
+}
+
+.video-container video {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 70vh;
+}
+
+.video-container::after {
+    /* Removed local scanlines */
+    content: none;
+}
+
+/* Buttons */
+button, .menu-btn, .menu-btn-large {
+    background: rgba(0,0,0,0.8);
+    border: 2px solid var(--fg-color);
+    color: var(--fg-color);
+    font-family: inherit;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 0 10px var(--fg-color);
+    transition: all 0.2s;
+    text-shadow: 0 0 5px var(--fg-color);
+}
+
+button:hover, .menu-btn:hover, .menu-btn-large:hover {
+    background-color: var(--fg-color);
+    color: #000;
+    box-shadow: 0 0 30px var(--fg-color);
+    transform: scale(1.05);
+    border-color: #fff;
+    text-shadow: none;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #555;
+    color: #555;
+    box-shadow: none;
+}
+
+.menu-btn-large {
+    width: 100%;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 1.5rem;
+}
+
+/* Animations */
+.blink {
+    animation: blinker 1s step-end infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+/* Code blocks */
+pre {
+    background-color: rgba(0, 10, 20, 0.9);
+    border: 2px solid var(--accent-color);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #aaffff;
+    box-shadow: 0 0 15px var(--accent-color);
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: rgba(255, 0, 255, 0.2);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    color: var(--highlight-color);
+    text-shadow: 1px 1px 0 #000;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: #aaffff;
+    text-shadow: none;
+}
+
+/* Instruction Buttons / Highlights */
+strong {
+    background: rgba(255, 0, 255, 0.3);
+    border: 1px solid var(--accent-color);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0 1px;
+    vertical-align: text-bottom;
+    color: #fff;
+    line-height: 1.2;
+    text-shadow: 0 0 2px black;
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+strong img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    filter: drop-shadow(0 0 2px var(--accent-color));
+}
+
+.icon-inline {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: text-bottom;
+    margin-right: 0.2rem;
+    display: inline-block;
+    filter: drop-shadow(0 0 2px var(--fg-color));
+}
+
+/* Menu Container */
+.menu-container {
+    text-align: center;
+    /* Removed border and background */
+    border: none;
+    background: transparent;
+    padding: 4rem;
+    max-width: 800px;
+    z-index: 5;
+    position: relative;
+    /* Added text shadow instead of box shadow */
+    text-shadow: 0 0 10px #000;
+    box-shadow: none;
+}
