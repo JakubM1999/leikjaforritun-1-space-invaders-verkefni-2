@@ -1,5 +1,9 @@
 # 👾 Space Invaders - Godot Course Material
 
+![Godot Engine](https://img.shields.io/badge/Godot-v4.x-%23478cbf?logo=godot-engine&logoColor=white)
+![Course Language](https://img.shields.io/badge/Language-Icelandic-blue)
+![Topic](https://img.shields.io/badge/Focus-Signals_%26_Groups-magenta)
+
 Welcome to the teaching materials for **Project 2: Space Invaders** in the Game Programming 1 course (*FORR2GL05DU*).
 
 This project builds upon the foundations laid in the Pong project, introducing intermediate Godot concepts required to manage complex interactions between multiple game objects.
