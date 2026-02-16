@@ -34,13 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nextBtn) nextBtn.disabled = (currentSlide === totalSlides - 1);
     }
 
-    function triggerTransition(callback) {
+    function triggerTransition(callback, direction = 'next') {
         if (isTransitioning) return;
         isTransitioning = true;
 
+        // Determine the class based on direction
+        const distortClass = direction === 'prev' ? 'distort-prev' : 'distort-next';
+
         // Start Static & Distortion
         staticOverlay.classList.add('active');
-        document.body.classList.add('distort-active');
+        document.body.classList.add(distortClass);
 
         // Wait for the "static" to fully obscure the screen (approx 150ms)
         setTimeout(() => {
@@ -50,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // End transition after animation is done (300ms total)
         setTimeout(() => {
             staticOverlay.classList.remove('active');
-            document.body.classList.remove('distort-active');
+            document.body.classList.remove(distortClass);
             isTransitioning = false;
         }, 300);
     }
@@ -60,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerTransition(() => {
                 currentSlide++;
                 updateSlide();
-            });
+            }, 'next');
         }
     }
 
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerTransition(() => {
                 currentSlide--;
                 updateSlide();
-            });
+            }, 'prev');
         }
     }
 

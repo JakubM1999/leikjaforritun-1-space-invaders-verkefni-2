@@ -26,14 +26,20 @@ body {
     align-items: center;
     perspective: 1000px;
     
-    /* 80s Starfield Background */
+    /* 80s Starfield Background - Brighter & More Visible */
     background-image: 
-        radial-gradient(white, rgba(255,255,255,.6) 2px, transparent 3px),
-        radial-gradient(var(--highlight-color), rgba(255,255,0,.4) 1px, transparent 2px),
-        radial-gradient(#ffccff, rgba(255,200,255,.3) 2px, transparent 3px);
-    background-size: 550px 550px, 350px 350px, 250px 250px;
-    background-position: 0 0, 40px 60px, 130px 270px;
-    animation: stars-move 100s linear infinite;
+        radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 100px 50px, var(--fg-color), rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 150px 100px, var(--highlight-color), rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 200px 150px, var(--accent-color), rgba(0,0,0,0));
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px, 450px 450px, 600px 600px, 400px 400px, 300px 300px, 500px 500px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px, 20px 20px, 10px 10px, 50px 50px, 80px 80px, 120px 120px;
+    animation: stars-move 200s linear infinite;
 }
 
 @keyframes stars-move {
@@ -387,4 +393,110 @@ strong img {
     /* Added text shadow instead of box shadow */
     text-shadow: 0 0 10px #000;
     box-shadow: none;
+}
+
+/* Transition Overlay - Hyperspace Particles */
+.tv-static {
+    position: fixed;
+    top: 50%; left: 50%;
+    width: 100vmax; height: 100vmax;
+    transform: translate(-50%, -50%) scale(1);
+    
+    /* Star pattern: Mix of white, cyan, magenta dots */
+    background-color: transparent;
+    background-image: 
+        radial-gradient(circle, #fff 1.5px, transparent 2px),
+        radial-gradient(circle, var(--fg-color) 1.5px, transparent 2px),
+        radial-gradient(circle, var(--accent-color) 2px, transparent 2.5px),
+        radial-gradient(circle, #fff 1px, transparent 1.5px);
+    background-size: 100px 100px, 160px 160px, 200px 200px, 250px 250px;
+    background-position: 0 0, 40px 70px, 100px 20px, 150px 150px;
+    
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    will-change: transform, opacity;
+}
+
+/* Warp Speed - NEXT (Zoom In / Fly Through) */
+body.distort-next .tv-static.active {
+    animation: warp-next 0.3s cubic-bezier(0.1, 0, 0.9, 1);
+}
+
+@keyframes warp-next {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(4); }
+}
+
+/* Warp Speed - PREV (Zoom Out / Reverse) */
+body.distort-prev .tv-static.active {
+    animation: warp-prev 0.3s cubic-bezier(0.1, 0, 0.9, 1);
+}
+
+@keyframes warp-prev {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(4); }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+}
+
+/* Content Transition - Arcade Warp (NEXT) */
+body.distort-next #slides-container, 
+body.distort-next .menu-container {
+    animation: arcade-warp-next 0.3s ease-in-out both;
+}
+
+@keyframes arcade-warp-next {
+    0% { 
+        transform: scale(1); 
+        opacity: 1; 
+        filter: blur(0) hue-rotate(0deg); 
+    }
+    45% { 
+        transform: scale(1.1); 
+        opacity: 0; 
+        filter: blur(5px) brightness(2) hue-rotate(90deg); 
+    }
+    55% { 
+        transform: scale(0.9); 
+        opacity: 0; 
+        filter: blur(5px) brightness(2) hue-rotate(-90deg); 
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: 1; 
+        filter: blur(0) hue-rotate(0deg); 
+    }
+}
+
+/* Content Transition - Arcade Warp (PREV) */
+body.distort-prev #slides-container, 
+body.distort-prev .menu-container {
+    animation: arcade-warp-prev 0.3s ease-in-out both;
+}
+
+@keyframes arcade-warp-prev {
+    0% { 
+        transform: scale(1); 
+        opacity: 1; 
+        filter: blur(0) hue-rotate(0deg); 
+    }
+    45% { 
+        transform: scale(0.9); 
+        opacity: 0; 
+        filter: blur(5px) brightness(2) hue-rotate(-90deg); 
+    }
+    55% { 
+        transform: scale(1.1); 
+        opacity: 0; 
+        filter: blur(5px) brightness(2) hue-rotate(90deg); 
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: 1; 
+        filter: blur(0) hue-rotate(0deg); 
+    }
 }
