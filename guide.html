@@ -31,7 +31,7 @@
                 <ul>
                     <li><strong>Scenes:</strong> Við búum til sér scenes fyrir Player, Invader og Bullet.</li>
                     <li><strong>Physics:</strong> Við notum <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> til að skynja árekstra.</li>
-                    <li><strong>Scripting:</strong> Við notum <code>_process</code> til að hreyfa hluti.</li>
+                    <li><strong>Scripting:</strong> Við notum <code>_process</code> til að hreyfa hluti (notum <strong><img src="images/icons/Script.svg" class="icon-inline">Script</strong>).</li>
                 </ul>
                 <p><em>Við munum bæta við: Signals (Samskipti) og Groups (Hópstjórnun).</em></p>
             </div>
@@ -41,13 +41,17 @@
         <section class="slide" id="slide-3">
             <div class="content">
                 <h2>SKREF 1: UPPSETNING (SETUP)</h2>
-                <p>Búðu til nýtt Godot verkefni sem heitir "Space Invaders".</p>
+                <p>Opnaðu Godot og smelltu á <strong><img src="images/icons/Add.svg" class="icon-inline">+ New</strong> hnappinn hægra megin.</p>
                 <br>
                 <ol>
+                    <li>Nefndu verkefnið <code>Space Invaders</code>.</li>
+                    <li>Veldu <strong>Forward+</strong> sem Renderer (efst til hægri).</li>
+                    <li>Smelltu á <strong>Create & Edit</strong>.</li>
+                    <br>
                     <li>Farðu í <strong><img src="images/icons/Tools.svg" class="icon-inline">Project -> Project Settings</strong>.</li>
                     <li>Stilltu <strong>Window Width</strong> á <code>600</code> og <strong>Height</strong> á <code>800</code>.</li>
                     <li>Stilltu <strong>Stretch Mode</strong> á <code>canvas_items</code>.</li>
-                    <li>Búðu til "Main" scene (<strong><img src="images/icons/Node2D.svg" class="icon-inline">Node2D</strong>) og vistaðu sem <code>main.tscn</code>.</li>
+                    <li>Búðu til "Main" scene (<strong><img src="images/icons/Node2D.svg" class="icon-inline">Node2D</strong>) og vistaðu (<strong><img src="images/icons/Save.svg" class="icon-inline">Ctrl+S</strong>) sem <code>main.tscn</code>.</li>
                 </ol>
             </div>
         </section>
@@ -72,7 +76,7 @@
         <section class="slide" id="slide-5">
             <div class="content">
                 <h2>SKREF 3: HREYFING LEIKMANNS</h2>
-                <p>Setjum skriftu á Player. Notum <code>clamp</code> til að halda honum inni.</p>
+                <p>Setjum skriftu (<strong><img src="images/icons/Script.svg" class="icon-inline">Script</strong>) á Player. Við notum <code>clamp</code> til að læsa skipinu inni á skjánum svo það fari ekki út fyrir hliðarnar.</p>
                 <pre><code>extends Area2D
 
 @export var speed = 400
@@ -81,7 +85,8 @@ func _process(delta):
     var input = Input.get_axis("ui_left", "ui_right")
     position.x += input * speed * delta
     
-    # Halda innan skjás (20px padding)
+    <span class="comment"># Halda innan skjás (20px padding)</span>
+    <span class="comment"># clamp(gildi, lágmark, hámark)</span>
     position.x = clamp(position.x, 20, 580)</code></pre>
             </div>
         </section>
@@ -90,7 +95,7 @@ func _process(delta):
         <section class="slide" id="slide-6">
             <div class="content">
                 <h2>SKREF 4: SKOTIÐ (BULLET SCENE)</h2>
-                <p>Búum til leysiskot.</p>
+                <p>Við þurfum að búa til sérstaka senu fyrir skotin svo við getum "instantiate-að" mörg eintök af þeim á meðan leikurinn er í gangi. Þetta verður einfalt en öflugt leysiskot.</p>
                 <br>
                 <ol>
                     <li>Nýtt Scene -> <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> -> <code>Bullet</code>.</li>
@@ -105,7 +110,7 @@ func _process(delta):
         <section class="slide" id="slide-7">
             <div class="content">
                 <h2>SKREF 5: KÓÐI SKOTSINS</h2>
-                <p>Skotið fer upp og eyðist ef það fer af skjánum.</p>
+                <p>Skotið fer upp og eyðist sjálfkrafa þegar það fer af skjánum til að spara tölvuafl.</p>
                 <pre><code>extends Area2D
 @export var speed = 600
 
@@ -114,7 +119,14 @@ func _process(delta):
 
 func _on_visible_on_screen_notifier_2d_screen_exited():
     queue_free()</code></pre>
-                <p>Mundu að tengja <code>screen_exited</code> merkið!</p>
+                <br>
+                <p><strong>Tengdu merkið:</strong></p>
+                <ol>
+                    <li>Veldu <strong>VisibleOnScreenNotifier2D</strong> í senunni.</li>
+                    <li>Farðu í <strong>Signals</strong> flipann efst (við hliðina á Inspector).</li>
+                    <li>Tvísmelltu á <code>screen_exited()</code>.</li>
+                    <li>Smelltu á <strong>Connect</strong> til að tengja það við skriftuna.</li>
+                </ol>
             </div>
         </section>
 
@@ -122,18 +134,28 @@ func _on_visible_on_screen_notifier_2d_screen_exited():
         <section class="slide" id="slide-8">
             <div class="content">
                 <h2>SKREF 6: AÐ SKJÓTA</h2>
-                <p>Aftur í <strong>Player</strong> skriftuna. Tengjum Bullet senuna.</p>
+                <p>Nú þurfum við að láta Player vita hvernig skotið lítur út. Við notum <code>@export</code> og <strong><img src="images/icons/PackedScene.svg" class="icon-inline">PackedScene</strong>.</p>
+                <br>
+                <p><em><strong>PackedScene:</strong> Er eins og "teikning" eða uppskrift af senu sem Godot getur notað til að búa til mörg ný eintök af í einu.</em></p>
                 <pre><code>@export var bullet_scene: PackedScene
 
 func _process(delta):
-    # ... hreyfing ...
+    <span class="comment"># ... hreyfing ...</span>
     if Input.is_action_just_pressed("ui_accept"):
         shoot()
 
 func shoot():
+    <span class="comment"># .instantiate() býr til nýtt eintak eftir teikningunni</span>
     var b = bullet_scene.instantiate()
     get_parent().add_child(b)
     b.position = position</code></pre>
+                <br>
+                <p><strong>Í Inspector:</strong></p>
+                <ol>
+                    <li>Veldu <strong>Player</strong> node-inn.</li>
+                    <li>Sérðu nýja hlutann "Bullet Scene" í Inspector?</li>
+                    <li>Dragðu <code>bullet.tscn</code> úr <strong><img src="images/icons/Filesystem.svg" class="icon-inline">FileSystem</strong> og slepptu því þangað.</li>
+                </ol>
             </div>
         </section>
 
@@ -141,17 +163,21 @@ func shoot():
         <section class="slide" id="slide-9">
             <div class="content">
                 <h2>SKREF 7: SKOTHRAÐI (COOLDOWN)</h2>
-                <p>Við viljum ekki "laser beam". Bætum við biðtíma.</p>
+                <p>Við viljum ekki að leikmaðurinn geti skotið endalaust ("laser beam"). Við notum Timer til að setja biðtíma milli skota.</p>
                 <br>
                 <ol>
-                    <li>Bættu <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> node við Player.</li>
-                    <li>Stilltu <strong>One Shot</strong> á ON og <strong>Wait Time</strong> á 0.5.</li>
+                    <li>Bættu <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> node sem barni á Player.</li>
+                    <li>Veldu Timer-inn og kíktu í <strong>Inspector</strong>:</li>
+                    <ul>
+                        <li>Hakaðu við <strong>One Shot</strong> (svo hann ræsist ekki sjálfkrafa aftur).</li>
+                        <li>Stilltu <strong>Wait Time</strong> á <code>0.5</code>.</li>
+                    </ul>
                 </ol>
                 <pre><code>func _process(delta):
-    # Bætum við skilyrði: Timer verður að vera stopp
+    <span class="comment"># Bætum við skilyrði: Timer verður að vera stopp</span>
     if Input.is_action_just_pressed("ui_accept") and $Timer.is_stopped():
         shoot()
-        $Timer.start() # Ræsa klukkuna</code></pre>
+        $Timer.start() <span class="comment"># Ræsa klukkuna</span></code></pre>
             </div>
         </section>
 
@@ -159,14 +185,20 @@ func shoot():
         <section class="slide" id="slide-10">
             <div class="content">
                 <h2>SKREF 8: GEIMVERAN (INVADER)</h2>
-                <p>Nú búum við til óvininn.</p>
+                <p>Nú búum við til óvininn. Við notum <strong>Groups</strong> til að geta stjórnað mörgum geimverum í einu síðar.</p>
                 <br>
                 <ol>
                     <li>Nýtt Scene -> <strong><img src="images/icons/Area2D.svg" class="icon-inline">Area2D</strong> -> <code>Invader</code>.</li>
-                    <li>Setja upp Visuals og CollisionShape.</li>
-                    <li><strong>Groups:</strong> Farðu í "Node" flipann -> Groups. Bættu við hópnum <code>aliens</code>.</li>
+                    <li>Bættu við mynd eða lit (<strong><img src="images/icons/Sprite2D.svg" class="icon-inline">Sprite2D</strong> / <strong><img src="images/icons/ColorRect.svg" class="icon-inline">ColorRect</strong>) og <strong><img src="images/icons/CollisionShape2D.svg" class="icon-inline">CollisionShape2D</strong> eins og á Player.</li>
+                    <li><strong>Að bæta í Hóp (Groups):</strong></li>
+                    <ul>
+                        <li>Veldu <strong>Invader</strong> node-inn.</li>
+                        <li>Farðu í <strong>Groups</strong> flipann efst (við hliðina á Inspector/Signals).</li>
+                        <li>Passaðu að valið sé <strong>Scene Groups</strong> flipinn (það er sjálfgefið).</li>
+                        <li>Skrifaðu <code>aliens</code> í boxið og smelltu á <strong><img src="images/icons/Add.svg" class="icon-inline">Add</strong>.</li>
+                    </ul>
                 </ol>
-                <p>Þessi hópur er lykillinn að því að stjórna öllum hernum í einu.</p>
+                <p>Þessi hópur leyfir okkur að senda skipun eins og <em>"Allir í hópnum 'aliens', hreyfið ykkur!"</em></p>
             </div>
         </section>
 
@@ -174,13 +206,17 @@ func shoot():
         <section class="slide" id="slide-11">
             <div class="content">
                 <h2>SKREF 9: HREYFING GEIMVERU</h2>
-                <p>Geimveran hreyfist <strong>ekki</strong> sjálf. Hún bíður eftir skipun.</p>
+                <p>Geimveran á ekki að hreyfa sig sjálf í hverjum ramma. Í staðinn búum við til fall sem "Main" sena leiksins getur kallað í þegar allur herinn á að taka skref.</p>
+                <br>
+                <p>Búðu til nýja skriftu (<strong><img src="images/icons/Script.svg" class="icon-inline">Script</strong>) á <strong>Invader</strong> node-inn:</p>
                 <pre><code>extends Area2D
 
+<span class="comment"># Þetta fall bíður eftir skipun um að hreyfa sig</span>
 func move(dx, dy):
     position.x += dx
     position.y += dy</code></pre>
-                <p>Við munum kalla á þetta fall utan frá með <code>call_group</code>.</p>
+                <br>
+                <p>Með því að nota <code>dx</code> og <code>dy</code> getum við notað skipunina <code>call_group</code> síðar til að hreyfa allan herinn samtímis með einni línu af kóða.</p>
             </div>
         </section>
 
@@ -188,16 +224,23 @@ func move(dx, dy):
         <section class="slide" id="slide-12">
             <div class="content">
                 <h2>SKREF 10: RÖÐUN Í GRIND</h2>
-                <p>Í <strong>Main</strong> skriftunni búum við til herinn.</p>
+                <p>Í stað þess að raða 40 geimverum handvirkt, notum við tvöfalda <code>for</code>-lykkju til að búa til fullkomna grind (grid).</p>
+                <br>
+                <ol>
+                    <li>Búðu til nýja skriftu (<strong><img src="images/icons/Script.svg" class="icon-inline">Script</strong>) á <strong>Main</strong> senu leiksins.</li>
+                    <li>Bættu við <code>@export var invader_scene: PackedScene</code> efst.</li>
+                    <li>Mundu að draga <code>invader.tscn</code> úr <strong><img src="images/icons/Filesystem.svg" class="icon-inline">FileSystem</strong> í Inspector-inn á Main node-num!</li>
+                </ol>
                 <pre><code>extends Node2D
+
 @export var invader_scene: PackedScene
 
 func _ready():
-    # 5 raðir, 8 dálkar
+    <span class="comment"># 5 raðir, 8 dálkar</span>
     for row in range(5):
         for col in range(8):
             var inv = invader_scene.instantiate()
-            # Reikna staðsetningu
+            <span class="comment"># Reikna staðsetningu (50px og 40px millibil)</span>
             inv.position = Vector2(60 + col * 50, 50 + row * 40)
             add_child(inv)</code></pre>
             </div>
@@ -207,17 +250,20 @@ func _ready():
         <section class="slide" id="slide-13">
             <div class="content">
                 <h2>SKREF 11: TAKTURINN (TIMER)</h2>
-                <p>Herinn hreyfist í takt. Notum Timer í Main scene.</p>
+                <p>Geimveruherinn hreyfist í takt (eins og í upprunalega leiknum). Við notum <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> í Main senu til að stjórna þessu.</p>
                 <br>
                 <ol>
-                    <li>Bættu <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> við Main.</li>
-                    <li>Wait Time: 1.0 (eða hraðar). Autostart: ON.</li>
-                    <li>Tengdu <code>timeout</code> merkið við Main skriftuna.</li>
+                    <li>Bættu <strong><img src="images/icons/Timer.svg" class="icon-inline">Timer</strong> node við <strong>Main</strong> senu.</li>
+                    <li>Í Inspector: <strong>Wait Time:</strong> <code>1.0</code> og hakið við <strong>Autostart:</strong> ON.</li>
+                    <li>Farðu í <strong>Signals</strong> flipann og tengdu <code>timeout()</code> við <strong>Main</strong> skriftuna.</li>
                 </ol>
                 <pre><code>var direction = 10
 
 func _on_timer_timeout():
+    <span class="comment"># 'call_group' sendir skilaboð á alla í einu!</span>
     get_tree().call_group("aliens", "move", direction, 0)</code></pre>
+                <br>
+                <p>Með því að hreyfa hópinn aðeins á hverjum tifi frá Timer, fáum við þetta klassíska arcade hreyfimynstur.</p>
             </div>
         </section>
 
@@ -225,18 +271,22 @@ func _on_timer_timeout():
         <section class="slide" id="slide-14">
             <div class="content">
                 <h2>SKREF 12: VEGGJAMERKI (SIGNALS)</h2>
-                <p>Hvernig vitum við ef herinn hittir vegg? Geimveran lætur vita!</p>
+                <p>Hvernig vitum við ef herinn hittir vegg? Við látum geimveruna láta vita með sínu eigin <strong>Signal</strong>.</p>
                 <br>
-                <p>Í <strong>Invader</strong> skriftunni:</p>
-                <pre><code># Skilgreina merki
+                <p>Breyttu <strong>Invader</strong> skriftunni:</p>
+                <pre><code><span class="comment"># Skilgreina eigið merki (custom signal)</span>
 signal hit_wall
 
 func move(dx, dy):
     position.x += dx
     position.y += dy
-    # Athuga hvort við séum komin út í kant
-    if position.x > 550 or position.x < 50:
+    
+    <span class="comment"># Athuga hvort við séum komin út í kant (600px breidd)</span>
+    if position.x > 570 or position.x < 30:
+        <span class="comment"># Senda merki: "Ég hitti vegg!"</span>
         hit_wall.emit()</code></pre>
+                <br>
+                <p><em><strong>Hvað er þetta?</strong> Áður notuðum við tilbúin merki (eins og <code>timeout</code>). Hér búum við til okkar eigið merki sem heitir <code>hit_wall</code> svo við getum látið aðra vita nákvæmlega hvenær við viljum.</em></p>
             </div>
         </section>
 
@@ -244,14 +294,24 @@ func move(dx, dy):
         <section class="slide" id="slide-15">
             <div class="content">
                 <h2>SKREF 13: TENGJA VEGGJAMERKIÐ</h2>
-                <p>Þegar Main býr til invader, þarf það að hlusta eftir merkinu.</p>
-                <pre><code># Í Main _ready lykkjunni:
-    inv.hit_wall.connect(_on_alien_hit_wall)
+                <p>Þar sem við búum til geimverurnar með kóða (í Step 10), þá þurfum við líka að tengja merkin þeirra með kóða.</p>
+                <br>
+                <ol>
+                    <li>Opnaðu <strong>Main</strong> skriftuna.</li>
+                    <li>Inni í <code>for</code>-lykkjunni, bættu við línu sem tengir merkið:</li>
+                </ol>
+                <pre><code><span class="comment"># Inni í _ready() lykkjunni:</span>
+var inv = invader_scene.instantiate()
+inv.hit_wall.connect(_on_alien_hit_wall) <span class="comment"># NÝ LÍNA</span>
+add_child(inv)
 
-# Nýtt fall í Main:
+<span class="comment"># Nýtt fall neðst í Main skriftuna:</span>
 func _on_alien_hit_wall():
-    direction *= -1 # Snúa við
-    get_tree().call_group("aliens", "move", 0, 20) # Fara niður</code></pre>
+    <span class="comment"># Ef einhver hittir vegg, þá snýr allur herinn við og fer niður!</span>
+    direction *= -1
+    get_tree().call_group("aliens", "move", 0, 20)</code></pre>
+                <br>
+                <p>Nú höfum við búið til flókið kerfi þar sem hver og ein geimvera fylgist með kantinum, en <strong>Main</strong> stjórnar heildarhreyfingunni.</p>
             </div>
         </section>
 
@@ -259,12 +319,18 @@ func _on_alien_hit_wall():
         <section class="slide" id="slide-16">
             <div class="content">
                 <h2>SKREF 14: RANDOM ÁRÁSIR</h2>
-                <p>Nú kemur <strong>Slembilukka</strong> (Randomness) inn. Geimverurnar skjóta til baka.</p>
+                <p>Nú kemur <strong>Slembilukka</strong> (Randomness) inn. Við viljum að geimverurnar skjóti til baka, en ekki allar í einu.</p>
                 <br>
-                <p>Í <strong>Invader</strong> skriftu, í <code>move</code> fallinu (sem keyrir reglulega):</p>
-                <pre><code>if randf() < 0.05: # 5% líkur í hvert skref
-    shoot_at_player()</code></pre>
-                <p>Þetta er betra en <code>_process</code> því það gerist bara í takt við leikinn.</p>
+                <p>Í <strong>Invader</strong> skriftu, bættu þessu við inni í <code>move</code> fallinu:</p>
+                <pre><code>func move(dx, dy):
+    <span class="comment"># ... hreyfing ...</span>
+    
+    <span class="comment"># randf() gefur okkur tölu milli 0 og 1</span>
+    <span class="comment"># 0.05 þýðir 5% líkur á að skjóta í hvert sinn sem herinn hreyfist</span>
+    if randf() < 0.05:
+        shoot_at_player()</code></pre>
+                <br>
+                <p><em><strong>Af hverju hér?</strong> Ef við settum þetta í <code>_process</code> myndi geimveran skjóta 60 sinnum á sekúndu! Með því að setja það í <code>move</code> þá gerist það aðeins í takt við taktinn í leiknum.</em></p>
             </div>
         </section>
 
@@ -272,13 +338,22 @@ func _on_alien_hit_wall():
         <section class="slide" id="slide-17">
             <div class="content">
                 <h2>SKREF 15: ÓVINASKOT</h2>
-                <p>Við þurfum annað skot fyrir óvininn svo hann hitti ekki aðrar geimverur.</p>
+                <p>Við þurfum annað skot fyrir óvininn svo hann hitti ekki aðrar geimverur (collision layers) og fari í rétta átt.</p>
                 <br>
                 <ol>
-                    <li>Duplicate-aðu <code>Bullet</code> scene og nefndu <code>EnemyBullet</code>.</li>
-                    <li>Breyttu litnum í rauðan.</li>
-                    <li>Breyttu skriftunni svo það fari <strong>niður</strong> (<code>position.y += speed</code>).</li>
+                    <li>Hægri-smelltu á <code>bullet.tscn</code> í <strong><img src="images/icons/Filesystem.svg" class="icon-inline">FileSystem</strong> og veldu <strong><img src="images/icons/Duplicate.svg" class="icon-inline">Duplicate</strong>. Nefndu það <code>enemy_bullet.tscn</code>.</li>
+                    <li>Opnaðu nýju senuna og breyttu litnum á <strong><img src="images/icons/ColorRect.svg" class="icon-inline">ColorRect</strong> í rauðan.</li>
+                    <li><strong>Aðskilja skriftu:</strong> Ef við breytum kóðanum núna, þá breytist Player skotið líka!</li>
+                    <ul>
+                        <li>Veldu <strong>EnemyBullet</strong> node-inn.</li>
+                        <li>Í Inspector, finndu hlutann <strong>Script</strong>.</li>
+                        <li>Smelltu á litlu örina (niður) við hliðina á <code>bullet.gd</code> og veldu <strong>Make Unique</strong>.</li>
+                    </ul>
                 </ol>
+                <pre><code><span class="comment"># Í enemy_bullet.gd</span>
+func _process(delta):
+    <span class="comment"># Plús (+) þýðir að skotið fer NIÐUR</span>
+    position.y += speed * delta</code></pre>
             </div>
         </section>
 
@@ -286,13 +361,18 @@ func _on_alien_hit_wall():
         <section class="slide" id="slide-18">
             <div class="content">
                 <h2>SKREF 16: LEIKMAÐUR DEYR</h2>
-                <p>Setjum Player í hópinn <code>player</code>.</p>
+                <p>Við þurfum að vita hvenær óvinaskotið hittir leikmanninn. Við notum <strong>Groups</strong> til að bera kennsl á hann.</p>
                 <br>
-                <p>Í <strong>EnemyBullet</strong> skriftunni:</p>
+                <ol>
+                    <li>Opnaðu <code>player.tscn</code>.</li>
+                    <li>Veldu Player node-inn, farðu í <strong>Groups</strong> flipann og bættu honum í hópinn <code>player</code>.</li>
+                    <li>Opnaðu <code>enemy_bullet.tscn</code> og tengdu <code>area_entered()</code> merkið við sína skriftu (<strong><img src="images/icons/Script.svg" class="icon-inline">Script</strong>).</li>
+                </ol>
                 <pre><code>func _on_area_entered(area):
+    <span class="comment"># Athuga hvort hluturinn sem við hittum sé í 'player' hópnum</span>
     if area.is_in_group("player"):
-        area.queue_free() # Drepa leikmann
-        queue_free()      # Eyða skoti
+        area.queue_free() <span class="comment"># Drepa leikmann</span>
+        queue_free()      <span class="comment"># Eyða skotinu</span>
         print("GAME OVER")</code></pre>
             </div>
         </section>
@@ -301,12 +381,29 @@ func _on_alien_hit_wall():
         <section class="slide" id="slide-19">
             <div class="content">
                 <h2>SKREF 17: STIGAGJÖF (SCORING)</h2>
-                <p>Notum Signals til að telja stig.</p>
+                <p>Til að telja stig þurfum við að láta Main vita þegar geimvera deyr. Við notum annað <strong>Signal</strong>.</p>
                 <br>
-                <p>1. Í <strong>Invader</strong>: <code>signal destroyed</code>. Emittaðu þetta áður en <code>queue_free()</code> gerist.<br>
-                2. Í <strong>Main</strong>: Tengdu merkið við stigateljara.</p>
-                <pre><code># Í Main
+                <ol>
+                    <li>Í <strong>Invader</strong> skriftunni, bættu þessu við:</p>
+                </ol>
+                <pre><code><span class="comment"># Efst</span>
+signal destroyed
+
+<span class="comment"># Neðst (mundu að tengja area_entered merkið!)</span>
+func _on_area_entered(area):
+    if area.is_in_group("bullets"):
+        destroyed.emit()
+        area.queue_free()
+        queue_free()</code></pre>
+                <br>
+                <p>2. Í <strong>Main</strong> skriftunni, bættu við stigateljara og tengdu hann í <code>_ready</code>:</p>
+                <pre><code><span class="comment"># Efst í Main</span>
 var score = 0
+
+<span class="comment"># Inni í _ready lykkjunni:</span>
+inv.destroyed.connect(_on_invader_destroyed)
+
+<span class="comment"># Neðst í Main</span>
 func _on_invader_destroyed():
     score += 100
     print("Score: ", score)</code></pre>
@@ -317,25 +414,34 @@ func _on_invader_destroyed():
         <section class="slide" id="slide-20">
             <div class="content">
                 <h2>SKREF 18: SIGUR (WIN)</h2>
-                <p>Hvernig vitum við hvort við unnum? Við teljum hópinn!</p>
+                <p>Hvernig vitum við hvort við höfum unnið? Við teljum einfaldlega hversu margir eru eftir í hópnum <code>aliens</code>.</p>
                 <br>
+                <p>Í <strong>Main</strong> skriftunni, bættu þessu við inni í <code>_process</code>:</p>
                 <pre><code>func _process(delta):
-    # Ef enginn er eftir í hópnum...
-    if get_tree().get_nodes_in_group("aliens").size() == 0:
+    <span class="comment"># Finnum alla í 'aliens' hópnum</span>
+    var aliens = get_tree().get_nodes_in_group("aliens")
+    
+    <span class="comment"># Ef listinn er tómur (stærð 0)...</span>
+    if aliens.size() == 0:
         print("YOU WIN!")
-        set_process(false) # Stoppa leikinn</code></pre>
+        <span class="comment"># Stöðvum leikinn svo við prentum ekki endalaust</span>
+        set_process(false)</code></pre>
+                <br>
+                <p><em><strong>Pæling:</strong> Gætum við gert þetta á hagkvæmari hátt? Já, við gætum athugað þetta inni í <code>_on_invader_destroyed</code> í staðinn fyrir að gá í hverjum einasta ramma!</em></p>
             </div>
         </section>
 
         <!-- Slide 21: Polish -->
         <section class="slide" id="slide-21">
             <div class="content">
-                <h2>SKREF 19: PÚSSNING</h2>
-                <p>Leikurinn virkar, en má vera betri.</p>
+                <h2>SKREF 19: PÚSSNING (VALFRJÁLST)</h2>
+                <p>Leikurinn virkar, en ef þú hefur tíma er gaman að bæta við "safa" (game juice). Hér eru nokkrar hugmyndir:</p>
+                <br>
                 <ul>
-                    <li>Lagaðu hraðann á Timer (hraðar þegar færri eru eftir?).</li>
-                    <li>Breyttu litunum.</li>
-                    <li>Settu bakgrunn.</li>
+                    <li><strong>Hraðari her:</strong> Geturðu látið <code>$Timer.wait_time</code> minnka í hvert sinn sem geimvera deyr? Þá verður leikurinn erfiðari eftir því sem líður á.</li>
+                    <li><strong>Hljóð:</strong> Bættu við <strong><img src="images/icons/AudioStreamPlayer.svg" class="icon-inline">AudioStreamPlayer2D</strong> node og spilaðu hljóð þegar skotið er eða þegar geimvera springur.</li>
+                    <li><strong>Bakgrunnur:</strong> Farðu í <strong>Project Settings -> Rendering -> Environment</strong> og breyttu <em>Default Clear Color</em> í dökksvartan.</li>
+                    <li><strong>Sprengingar:</strong> Geturðu notað <code>CPUParticles2D</code> til að búa til neista?</li>
                 </ul>
             </div>
         </section>

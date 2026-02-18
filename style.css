@@ -325,7 +325,8 @@ pre {
     overflow-x: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
-    color: #aaffff;
+    color: var(--fg-color); /* Same cyan as scrollbar */
+    font-weight: bold;
     box-shadow: 0 0 15px var(--accent-color);
 }
 
@@ -342,8 +343,14 @@ pre code {
     background-color: transparent;
     padding: 0;
     border-radius: 0;
-    color: #aaffff;
+    color: var(--fg-color);
     text-shadow: none;
+    font-weight: bold;
+}
+
+.comment {
+    color: #888888; /* Dimmed gray for comments */
+    font-style: italic;
 }
 
 /* Instruction Buttons / Highlights */

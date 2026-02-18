@@ -32,6 +32,7 @@
                     <li><strong>Groups (Hópar):</strong> Hvernig á að stjórna mörgum hlutum (eins og her af geimverum) samtímis.</li>
                     <li><strong><img src="images/icons/Timer.svg" class="icon-inline">Timers:</strong> Hvernig á að stýra tímasetningum í leiknum.</li>
                     <li><strong>Instantiating:</strong> Hvernig á að búa til hluti (skot, geimverur) á keyrslutíma.</li>
+                    <li><strong>Randomness (Slembilukka):</strong> Hvernig á að láta hluti gerast af handahófi.</li>
                 </ul>
             </div>
         </section>
@@ -76,8 +77,31 @@ if body.is_in_group("aliens"):
             </div>
         </section>
 
-        <!-- Slide 4: Randomness -->
+        <!-- Slide 4: Instantiating -->
         <section class="slide" id="slide-4">
+            <div class="content">
+                <h2>// INSTANTIATING (TILVIKUN)</h2>
+                <p>Í Godot búum við oft til hluti á keyrslutíma í stað þess að setja þá alla handvirkt í editorinn (t.d. skot eða nýjar geimverur).</p>
+                <br>
+                <div class="grid-2">
+                    <div>
+                        <p>Við notum <code>.instantiate()</code> til að búa til nýtt eintak af "Scene" sem við höfum hannað áður.</p>
+                        <p>Svo þurfum við að bæta því við í "Tree-ið" með <code>add_child()</code>.</p>
+                    </div>
+                    <div>
+                        <pre><code>var bullet_scene = preload("res://bullet.tscn")
+
+func shoot():
+    var bullet = bullet_scene.instantiate()
+    add_child(bullet)
+    bullet.global_position = global_position</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Randomness -->
+        <section class="slide" id="slide-5">
             <div class="content">
                 <h2>// RANDOMNESS (SLEMBILUKKA)</h2>
                 <p>Í leikjum þurfum við oft að láta hluti gerast af handahófi, eins og hvar geimverur birtast eða hvenær þær skjóta.</p>
@@ -95,8 +119,8 @@ if randf() < 0.01:
             </div>
         </section>
 
-        <!-- Slide 5: Conclusion -->
-        <section class="slide" id="slide-5">
+        <!-- Slide 6: Conclusion -->
+        <section class="slide" id="slide-6">
             <div class="content centered">
                 <h2>TILBÚIN(N)?</h2>
                 <p>Í næsta hluta munum við fara yfir skref-fyrir-skref leiðbeiningar við að smíða leikinn.</p>
